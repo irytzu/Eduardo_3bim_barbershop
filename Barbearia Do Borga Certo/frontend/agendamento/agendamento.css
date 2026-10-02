@@ -1,0 +1,27 @@
+/* Estilos especificos da pagina de Agendamentos */
+
+.lista-servicos-sel {
+    list-style: none;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.lista-servicos-sel li {
+    background-color: var(--cor-fundo);
+    border: 1px solid var(--cor-borda);
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-servicos-sel li button {
+    background: none;
+    border: none;
+    color: var(--cor-aviso);
+    font-weight: bold;
+    cursor: pointer;
+}

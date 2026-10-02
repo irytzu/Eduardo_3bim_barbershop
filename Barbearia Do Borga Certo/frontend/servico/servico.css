@@ -1,0 +1,6 @@
+/* Estilos especificos da pagina de Servicos */
+/* A maior parte do layout vem de ../common.css */
+
+.form-esquerda textarea {
+    resize: vertical;
+}

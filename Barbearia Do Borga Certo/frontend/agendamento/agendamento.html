@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Agendamentos - BarberShop</title>
+    <link rel="stylesheet" href="../common.css">
+    <link rel="stylesheet" href="agendamento.css">
+</head>
+
+<body onload="inicializar()">
+    <header>
+        <h1>&#9986;&#65039; BarberShop</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="../menu/menu.html">Inicio</a></li>
+                <li><a href="../servico/servico.html">Servicos</a></li>
+                <li><a href="../cliente/cliente.html">Clientes</a></li>
+                <li><a href="../funcionario/funcionario.html">Barbeiros</a></li>
+                <li><a href="../cargo/cargo.html">Cargos</a></li>
+                <li><a href="../agendamento/agendamento.html">Agendamentos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container-master">
+        <div class="conteudo-principal">
+            <section class="form-esquerda" style="flex: 2 1 320px;">
+                <h2>Dados do Agendamento</h2>
+
+                <label for="inputId_agendamento">ID do Agendamento</label>
+                <div class="linha-id">
+                    <input type="text" id="inputId_agendamento" placeholder="Ex: 1">
+                    <input type="button" value="Procure" id="btProcure" onclick="procure()">
+                    <input type="button" value="Inserir" id="btInserir" onclick="inserir()" style="display:none;">
+                    <input type="button" value="Alterar" id="btAlterar" onclick="alterar()" style="display:none;">
+                    <input type="button" value="Excluir" id="btExcluir" onclick="excluir()" style="display:none;">
+                </div>
+
+                <label for="inputData">Data</label>
+                <input type="date" id="inputData">
+
+                <label for="inputHora">Hora</label>
+                <input type="time" id="inputHora">
+
+                <label for="selectCliente">Cliente</label>
+                <select id="selectCliente" disabled>
+                    <option value="">Carregando...</option>
+                </select>
+
+                <label for="selectFuncionario">Barbeiro</label>
+                <select id="selectFuncionario" disabled>
+                    <option value="">Carregando...</option>
+                </select>
+
+                <label for="selectStatus">Status</label>
+                <select id="selectStatus" disabled>
+                    <option value="agendado">Agendado</option>
+                    <option value="concluido">Concluido</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+
+                <div id="divAviso">Informe o ID e clique em Procure</div>
+
+                <div class="botoes-acao">
+                    <input type="button" value="Salvar" id="btSalvar" onclick="salvar()" style="display:none;">
+                    <input type="button" value="Cancelar" id="btCancelar" onclick="cancelarOperacao()" style="display:none;">
+                </div>
+            </section>
+
+            <aside class="form-direita">
+                <h2>Servicos do Agendamento</h2>
+                <p class="instrucao-imagem">(Selecione um servico disponivel para incluir; use apenas ao inserir)</p>
+                <select id="selectServicoParaAdicionar" style="width:100%; margin-bottom: 0.6rem;" disabled>
+                    <option value="">Carregando...</option>
+                </select>
+                <input type="button" value="+ Adicionar Servico" id="btAdicionarServico" onclick="adicionarServico()" style="display:none; width:100%;">
+                <ul id="listaServicosSelecionados" class="lista-servicos-sel"></ul>
+            </aside>
+        </div>
+
+        <section class="lista-registros">
+            <h3>Agendamentos Cadastrados</h3>
+            <div id="outputSaida">Carregando...</div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Nome Completo do Aluno &mdash; Turma &mdash; 2026</p>
+        <p>&copy; 2026 BarberShop. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="./agendamento.js"></script>
+</body>
+
+</html>

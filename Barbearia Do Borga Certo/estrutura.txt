@@ -1,0 +1,49 @@
+Barbearia Do Borga/
+│   │
+│   ├── backend/
+│   │   └── controllers/
+│   │       ├── agendamentoController.js
+│   │       ├── cargoController.js
+│   │       ├── clienteController.js
+│   │       ├── funcionarioController.js
+│   │       ├── pessoaController.js
+│   │       └── servicoController.js
+│   ├────── routes/
+│   │       ├── agendamentoRoutes.js
+│   │       ├── cargoRoutes.js
+│   │       ├── clienteRoutes.js
+│   │       ├── funcionarioRoutes.js
+│   │       ├── pessoaRoutes.js
+│   │       └── servicoRoutes.js
+│   ├────── .env
+│   ├────── banco.sql
+│   ├────── database.js
+│   ├────── package-lock.json
+│   ├────── package.json
+│   ├────── server.js
+│   └── frontend/
+        ├── agendamento/
+        │   ├── agendamento.css
+        │   ├── agendamento.html
+        │   └── agendamento.js
+        ├── cargo/
+        │   ├── cargo.html
+        │   └── cargo.js
+        ├── cliente/
+        │   ├── cliente.html
+        │   └── cliente.js
+        ├── funcionario/
+        │   ├── funcionario.html
+        │   └── funcionario.js
+        ├── menu/
+        │   ├── menu.css
+        │   └── menu.html
+        ├── pessoa/
+        │   ├── index.html
+        │   └── pessoa.js
+        └── servico/
+            ├── servico.css
+            ├── servico.html
+            └── servico.js
+── index.html
+── README.md
