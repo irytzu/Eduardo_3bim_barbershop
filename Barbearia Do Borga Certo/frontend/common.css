@@ -219,20 +219,23 @@ input[type="button"]:hover {
 }
 
 .img-container img {
-    max-width: 100%;
+    width: 280px;
     height: 280px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border: 3px dashed var(--cor-borda);
     border-radius: 8px;
     padding: 5px;
-    cursor: pointer;
-    transition: border-color 0.3s, transform 0.3s;
     background-color: #eee;
+    box-sizing: border-box;
 }
 
-.img-container img:hover {
-    border-color: var(--cor-destaque);
-    transform: scale(1.02);
+.instrucao-imagem code {
+    background-color: var(--cor-fundo);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
 }
 
 /* --- Listagem --- */

@@ -10,15 +10,15 @@ async function inicializar() {
     await listar();
 }
 
-// A foto e fixa: busca o arquivo imagens/funcionario_<CPF>.png
-// Se nao existir, cai na silhueta padrao
-function carregarImagem(cpf) {
+// Busca o arquivo pelo NOME salvo no banco (campo foto_funcionario)
+// Se nao tiver nome salvo, ou o arquivo nao existir, cai na silhueta padrao
+function carregarImagem(nomeArquivo) {
     const img = document.getElementById('imgFuncionario');
-    if (!cpf) {
+    if (!nomeArquivo) {
         img.src = SILHUETA_URL;
         return;
     }
-    img.src = `${URL_API}/imagens/funcionario_${cpf}.png?t=${new Date().getTime()}`;
+    img.src = `${URL_API}/imagens/${nomeArquivo}?t=${new Date().getTime()}`;
     img.onerror = () => { img.src = SILHUETA_URL; };
 }
 
@@ -60,7 +60,7 @@ async function procure() {
 
     if (funcionario) {
         mostrarDadosFuncionario(funcionario);
-        carregarImagem(cpf);
+        carregarImagem(funcionario.foto_funcionario);
         visibilidadeDosBotoes('inline', 'none', 'inline', 'inline', 'none');
         mostrarAviso("Achou no banco, pode alterar ou excluir");
     } else {
@@ -75,7 +75,7 @@ function inserir() {
     bloquearAtributos(false);
     visibilidadeDosBotoes('none', 'none', 'none', 'none', 'inline');
     oQueEstaFazendo = 'inserindo';
-    mostrarAviso("INSERINDO - Preencha os dados e clique em salvar. Depois, salve a foto como imagens/funcionario_CPF.png");
+    mostrarAviso("INSERINDO - Preencha os dados (incluindo o nome do arquivo da foto, se tiver) e clique em salvar");
 }
 
 function alterar() {
@@ -102,8 +102,9 @@ async function salvar() {
     const cargo_id_cargo = document.getElementById("selectCargo").value || null;
     const salario_funcionario = parseFloat(document.getElementById("inputSalario").value) || 0.0;
     const especialidade_funcionario = document.getElementById("inputEspecialidade").value;
+    const foto_funcionario = document.getElementById("inputFoto_funcionario").value.trim();
 
-    const dados = { pessoa_cpf_pessoa, nome_pessoa, data_nascimento_pessoa, endereco_pessoa, email_pessoa, senha_pessoa, cargo_id_cargo, salario_funcionario, especialidade_funcionario };
+    const dados = { pessoa_cpf_pessoa, nome_pessoa, data_nascimento_pessoa, endereco_pessoa, email_pessoa, senha_pessoa, cargo_id_cargo, salario_funcionario, especialidade_funcionario, foto_funcionario };
 
     try {
         let resposta;
@@ -124,9 +125,7 @@ async function salvar() {
         }
 
         mostrarAviso(data.mensagem);
-        if (oQueEstaFazendo === 'excluindo') {
-            carregarImagem(null);
-        }
+        carregarImagem(null);
 
         visibilidadeDosBotoes('inline', 'none', 'none', 'none', 'none');
         limparAtributos();
@@ -176,6 +175,7 @@ function mostrarDadosFuncionario(f) {
     document.getElementById("selectCargo").value = f.cargo_id_cargo || '';
     document.getElementById("inputSalario").value = f.salario_funcionario;
     document.getElementById("inputEspecialidade").value = f.especialidade_funcionario || '';
+    document.getElementById("inputFoto_funcionario").value = f.foto_funcionario || '';
     bloquearAtributos(true);
 }
 
@@ -190,6 +190,7 @@ function limparAtributos() {
     document.getElementById("selectCargo").value = "";
     document.getElementById("inputSalario").value = "";
     document.getElementById("inputEspecialidade").value = "";
+    document.getElementById("inputFoto_funcionario").value = "";
     bloquearAtributos(true);
 }
 
@@ -203,6 +204,7 @@ function bloquearAtributos(soLeitura) {
     document.getElementById("selectCargo").disabled = soLeitura;
     document.getElementById("inputSalario").readOnly = soLeitura;
     document.getElementById("inputEspecialidade").readOnly = soLeitura;
+    document.getElementById("inputFoto_funcionario").readOnly = soLeitura;
 }
 
 function visibilidadeDosBotoes(btP, btI, btA, btE, btS) {

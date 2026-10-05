@@ -29,7 +29,8 @@ CREATE TABLE public.servico (
     nome_servico character varying(60),
     descricao_servico character varying(255),
     duracao_minutos_servico integer,
-    preco_servico double precision
+    preco_servico double precision,
+    imagem_servico character varying(100)
 );
 
 -- Tabela com relacionamento 1:1 com pessoa
@@ -43,7 +44,8 @@ CREATE TABLE public.funcionario (
     pessoa_cpf_pessoa character varying(20) NOT NULL,
     salario_funcionario double precision,
     cargo_id_cargo integer,
-    especialidade_funcionario character varying(80)
+    especialidade_funcionario character varying(80),
+    foto_funcionario character varying(100)
 );
 
 -- Tabela com relacionamento 1:N com cliente e 1:N com funcionario
@@ -128,17 +130,19 @@ INSERT INTO public.cargo (id_cargo, nome_cargo) VALUES
 (10, 'Assistente Administrativo');
 
 -- SERVICO (10 registros)
-INSERT INTO public.servico (id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico) VALUES
-(1, 'Corte Social', 'Corte classico com maquina e tesoura', 30, 35.00),
-(2, 'Corte Degrade', 'Corte moderno com degrade nas laterais', 40, 45.00),
-(3, 'Barba Completa', 'Aparar, desenhar e finalizar com toalha quente', 30, 30.00),
-(4, 'Corte + Barba', 'Combo corte e barba completos', 60, 65.00),
-(5, 'Sobrancelha', 'Design de sobrancelha na navalha', 15, 15.00),
-(6, 'Pezinho', 'Acabamento de nuca e contorno', 10, 10.00),
-(7, 'Hidratacao Capilar', 'Tratamento de hidratacao profunda', 30, 40.00),
-(8, 'Coloracao', 'Pintura e tratamento de cor', 60, 80.00),
-(9, 'Relaxamento', 'Relaxamento capilar', 50, 70.00),
-(10, 'Platinado', 'Descoloracao e tonalizacao', 90, 120.00);
+-- imagem_servico guarda apenas o NOME do arquivo (ex: 'corte1.png'), que deve
+-- estar salvo dentro da pasta imagens/ do projeto
+INSERT INTO public.servico (id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico, imagem_servico) VALUES
+(1, 'Corte Social', 'Corte classico com maquina e tesoura', 30, 35.00, 'corte1.png'),
+(2, 'Corte Degrade', 'Corte moderno com degrade nas laterais', 40, 45.00, 'corte2.png'),
+(3, 'Barba Completa', 'Aparar, desenhar e finalizar com toalha quente', 30, 30.00, 'barba1.png'),
+(4, 'Corte + Barba', 'Combo corte e barba completos', 60, 65.00, 'combo1.png'),
+(5, 'Sobrancelha', 'Design de sobrancelha na navalha', 15, 15.00, NULL),
+(6, 'Pezinho', 'Acabamento de nuca e contorno', 10, 10.00, NULL),
+(7, 'Hidratacao Capilar', 'Tratamento de hidratacao profunda', 30, 40.00, NULL),
+(8, 'Coloracao', 'Pintura e tratamento de cor', 60, 80.00, NULL),
+(9, 'Relaxamento', 'Relaxamento capilar', 50, 70.00, NULL),
+(10, 'Platinado', 'Descoloracao e tonalizacao', 90, 120.00, NULL);
 
 -- PESSOA (10 registros: 5 clientes + 5 funcionarios)
 INSERT INTO public.pessoa (cpf_pessoa, nome_pessoa, data_nascimento_pessoa, endereco_pessoa, senha_pessoa, email_pessoa) VALUES
@@ -168,17 +172,19 @@ INSERT INTO public.cliente (pessoa_cpf_pessoa, data_cadastro_cliente) VALUES
 
 -- FUNCIONARIO (10 registros, 1:1 com pessoa, N:1 com cargo)
 -- A foto e exibida automaticamente via imagens/funcionario_<CPF>.png (arquivo colocado manualmente)
-INSERT INTO public.funcionario (pessoa_cpf_pessoa, salario_funcionario, cargo_id_cargo, especialidade_funcionario) VALUES
-('11111111111', 2200.00, 1, 'Cortes classicos'),
-('22222222222', 2500.00, 1, 'Degrade'),
-('33333333333', 3200.00, 2, 'Barba e navalha'),
-('44444444444', 2100.00, 3, 'Atendimento'),
-('55555555555', 4500.00, 4, 'Gestao'),
-('66666666666', 2300.00, 1, 'Corte infantil'),
-('77777777777', 2800.00, 2, 'Coloracao'),
-('88888888888', 2000.00, 9, 'Aprendiz geral'),
-('99999999999', 2600.00, 5, 'Penteados'),
-('10101010101', 1900.00, 10, 'Agenda e financeiro');
+-- foto_funcionario guarda apenas o NOME do arquivo (ex: 'joao.png'), que deve
+-- estar salvo dentro da pasta imagens/ do projeto
+INSERT INTO public.funcionario (pessoa_cpf_pessoa, salario_funcionario, cargo_id_cargo, especialidade_funcionario, foto_funcionario) VALUES
+('11111111111', 2200.00, 1, 'Cortes classicos', NULL),
+('22222222222', 2500.00, 1, 'Degrade', NULL),
+('33333333333', 3200.00, 2, 'Barba e navalha', NULL),
+('44444444444', 2100.00, 3, 'Atendimento', NULL),
+('55555555555', 4500.00, 4, 'Gestao', NULL),
+('66666666666', 2300.00, 1, 'Corte infantil', NULL),
+('77777777777', 2800.00, 2, 'Coloracao', NULL),
+('88888888888', 2000.00, 9, 'Aprendiz geral', NULL),
+('99999999999', 2600.00, 5, 'Penteados', NULL),
+('10101010101', 1900.00, 10, 'Agenda e financeiro', NULL);
 
 -- AGENDAMENTO (10 registros, 1:N com cliente e funcionario)
 INSERT INTO public.agendamento (id_agendamento, data_agendamento, hora_agendamento, cliente_cpf_pessoa, funcionario_cpf_pessoa, status_agendamento) VALUES

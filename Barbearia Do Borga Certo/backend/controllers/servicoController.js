@@ -1,6 +1,4 @@
 const { query } = require('../database');
-const fs = require('fs');
-const path = require('path');
 
 // Listar todos os servicos
 exports.listarServicos = async (req, res) => {
@@ -36,15 +34,15 @@ exports.obterServico = async (req, res) => {
 // Criar servico
 exports.criarServico = async (req, res) => {
     try {
-        const { id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico } = req.body;
+        const { id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico, imagem_servico } = req.body;
 
         if (!nome_servico) {
             return res.status(400).json({ sucesso: false, mensagem: 'O nome do servico e obrigatorio.' });
         }
 
         const sql = `
-            INSERT INTO public.servico (id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO public.servico (id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico, imagem_servico)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
         `;
         const values = [
@@ -52,7 +50,8 @@ exports.criarServico = async (req, res) => {
             nome_servico,
             descricao_servico || null,
             duracao_minutos_servico || 30,
-            preco_servico || 0.0
+            preco_servico || 0.0,
+            imagem_servico || null
         ];
 
         const result = await query(sql, values);
@@ -67,15 +66,16 @@ exports.criarServico = async (req, res) => {
 exports.atualizarServico = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
-        const { nome_servico, descricao_servico, duracao_minutos_servico, preco_servico } = req.body;
+        const { nome_servico, descricao_servico, duracao_minutos_servico, preco_servico, imagem_servico } = req.body;
 
         const sql = `
             UPDATE public.servico
             SET nome_servico = $1,
                 descricao_servico = $2,
                 duracao_minutos_servico = $3,
-                preco_servico = $4
-            WHERE id_servico = $5
+                preco_servico = $4,
+                imagem_servico = $5
+            WHERE id_servico = $6
             RETURNING *
         `;
         const values = [
@@ -83,6 +83,7 @@ exports.atualizarServico = async (req, res) => {
             descricao_servico || null,
             duracao_minutos_servico || 30,
             preco_servico || 0.0,
+            imagem_servico || null,
             id
         ];
 
@@ -104,12 +105,10 @@ exports.deletarServico = async (req, res) => {
     try {
         const id = parseInt(req.params.id, 10);
 
+        // Observacao: o arquivo de imagem na pasta imagens/ NAO e apagado
+        // automaticamente, pois o mesmo arquivo pode estar sendo usado por
+        // outro servico. Apague manualmente se quiser.
         await query('DELETE FROM public.servico WHERE id_servico = $1', [id]);
-
-        const imgPath = path.join(__dirname, '../../imagens', `servico_${id}.png`);
-        if (fs.existsSync(imgPath)) {
-            fs.unlinkSync(imgPath);
-        }
 
         res.json({ sucesso: true, mensagem: 'Servico excluido com sucesso!' });
     } catch (error) {

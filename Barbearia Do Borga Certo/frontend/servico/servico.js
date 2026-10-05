@@ -9,45 +9,16 @@ async function inicializar() {
     await listar();
 }
 
-function carregarImagem(id) {
+// Busca o arquivo pelo NOME salvo no banco (campo imagem_servico)
+// Se nao tiver nome salvo, ou o arquivo nao existir, cai na silhueta padrao
+function carregarImagem(nomeArquivo) {
     const img = document.getElementById('imgServico');
-    if (!id) {
+    if (!nomeArquivo) {
         img.src = SILHUETA_URL;
         return;
     }
-    img.src = `${URL_API}/imagens/servico_${id}.png?t=${new Date().getTime()}`;
+    img.src = `${URL_API}/imagens/${nomeArquivo}?t=${new Date().getTime()}`;
     img.onerror = () => { img.src = SILHUETA_URL; };
-}
-
-function acionarUpload() {
-    if (oQueEstaFazendo !== 'inserindo' && oQueEstaFazendo !== 'alterando') {
-        mostrarAviso("Clique em Inserir ou Alterar primeiro para poder escolher uma imagem.");
-        return;
-    }
-    document.getElementById('inputImagem').click();
-}
-
-function previewImagem() {
-    const inputFiles = document.getElementById('inputImagem').files;
-    if (inputFiles.length > 0) {
-        const url = URL.createObjectURL(inputFiles[0]);
-        document.getElementById('imgServico').src = url;
-        mostrarAviso("Imagem escolhida! Clique em Salvar para concluir.");
-    }
-}
-
-async function uploadImagemParaServidor(id) {
-    const inputFiles = document.getElementById('inputImagem').files;
-    if (inputFiles.length === 0) return;
-
-    const formData = new FormData();
-    formData.append('imagem', inputFiles[0]);
-
-    try {
-        await fetch(`${URL_API}/servico/upload/${id}`, { method: 'POST', body: formData });
-    } catch (erro) {
-        console.error("Erro ao enviar imagem:", erro);
-    }
 }
 
 async function procurePorChavePrimaria(chave) {
@@ -72,7 +43,7 @@ async function procure() {
 
     if (servico) {
         mostrarDadosServico(servico);
-        carregarImagem(id_servico);
+        carregarImagem(servico.imagem_servico);
         visibilidadeDosBotoes('inline', 'none', 'inline', 'inline', 'none');
         mostrarAviso("Achou no banco, pode alterar ou excluir");
     } else {
@@ -87,14 +58,14 @@ function inserir() {
     bloquearAtributos(false);
     visibilidadeDosBotoes('none', 'none', 'none', 'none', 'inline');
     oQueEstaFazendo = 'inserindo';
-    mostrarAviso("INSERINDO - Preencha os dados, escolha a imagem e clique em salvar");
+    mostrarAviso("INSERINDO - Preencha os dados (incluindo o nome do arquivo da imagem, se tiver) e clique em salvar");
 }
 
 function alterar() {
     bloquearAtributos(false);
     visibilidadeDosBotoes('none', 'none', 'none', 'none', 'inline');
     oQueEstaFazendo = 'alterando';
-    mostrarAviso("ALTERANDO - Altere os dados, mude a imagem (opcional) e clique em salvar");
+    mostrarAviso("ALTERANDO - Altere os dados e clique em salvar");
 }
 
 function excluir() {
@@ -110,30 +81,36 @@ async function salvar() {
     const descricao_servico = document.getElementById("inputDescricao_servico").value;
     const duracao_minutos_servico = parseInt(document.getElementById("inputDuracao_minutos_servico").value) || 30;
     const preco_servico = parseFloat(document.getElementById("inputPreco_servico").value) || 0.0;
+    const imagem_servico = document.getElementById("inputImagem_servico").value.trim();
 
-    const dadosServico = { id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico };
+    const dadosServico = { id_servico, nome_servico, descricao_servico, duracao_minutos_servico, preco_servico, imagem_servico };
 
     try {
+        let resposta;
         if (oQueEstaFazendo === 'inserindo') {
-            await fetch(`${URL_API}/servico`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosServico) });
-            await uploadImagemParaServidor(id_servico);
-            mostrarAviso("Inserido no Banco de Dados com sucesso!");
+            resposta = await fetch(`${URL_API}/servico`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosServico) });
         } else if (oQueEstaFazendo === 'alterando') {
-            await fetch(`${URL_API}/servico/${id_servico}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosServico) });
-            await uploadImagemParaServidor(id_servico);
-            mostrarAviso("Alterado no Banco de Dados com sucesso!");
+            resposta = await fetch(`${URL_API}/servico/${id_servico}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosServico) });
         } else if (oQueEstaFazendo === 'excluindo') {
-            await fetch(`${URL_API}/servico/${id_servico}`, { method: 'DELETE' });
-            carregarImagem(null);
-            mostrarAviso("Excluido do Banco de Dados!");
+            resposta = await fetch(`${URL_API}/servico/${id_servico}`, { method: 'DELETE' });
         }
+
+        const data = await resposta.json();
+
+        if (!data.sucesso) {
+            mostrarAviso("ERRO: " + data.mensagem);
+            return;
+        }
+
+        mostrarAviso(data.mensagem);
+        carregarImagem(null);
 
         visibilidadeDosBotoes('inline', 'none', 'none', 'none', 'none');
         limparAtributos();
         document.getElementById("inputId_servico").value = "";
         listar();
     } catch (erro) {
-        mostrarAviso("Erro ao efetuar operacao no servidor.");
+        mostrarAviso("Erro ao efetuar operacao no servidor. Verifique se o servidor (npm start) esta rodando.");
     }
 }
 
@@ -172,6 +149,7 @@ function mostrarDadosServico(s) {
     document.getElementById("inputDescricao_servico").value = s.descricao_servico || '';
     document.getElementById("inputDuracao_minutos_servico").value = s.duracao_minutos_servico;
     document.getElementById("inputPreco_servico").value = s.preco_servico;
+    document.getElementById("inputImagem_servico").value = s.imagem_servico || '';
     bloquearAtributos(true);
 }
 
@@ -182,7 +160,7 @@ function limparAtributos() {
     document.getElementById("inputDescricao_servico").value = "";
     document.getElementById("inputDuracao_minutos_servico").value = "30";
     document.getElementById("inputPreco_servico").value = "";
-    document.getElementById("inputImagem").value = "";
+    document.getElementById("inputImagem_servico").value = "";
     bloquearAtributos(true);
 }
 
@@ -192,6 +170,7 @@ function bloquearAtributos(soLeitura) {
     document.getElementById("inputDescricao_servico").readOnly = soLeitura;
     document.getElementById("inputDuracao_minutos_servico").readOnly = soLeitura;
     document.getElementById("inputPreco_servico").readOnly = soLeitura;
+    document.getElementById("inputImagem_servico").readOnly = soLeitura;
 }
 
 function visibilidadeDosBotoes(btP, btI, btA, btE, btS) {

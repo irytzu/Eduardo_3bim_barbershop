@@ -3,7 +3,7 @@ const { query, pool } = require('../database');
 exports.listarFuncionarios = async (req, res) => {
     try {
         const result = await query(
-            `SELECT f.pessoa_cpf_pessoa, p.nome_pessoa, p.email_pessoa, f.salario_funcionario, f.cargo_id_cargo, c.nome_cargo, f.especialidade_funcionario
+            `SELECT f.pessoa_cpf_pessoa, p.nome_pessoa, p.email_pessoa, f.salario_funcionario, f.cargo_id_cargo, c.nome_cargo, f.especialidade_funcionario, f.foto_funcionario
              FROM public.funcionario f
              JOIN public.pessoa p ON f.pessoa_cpf_pessoa = p.cpf_pessoa
              LEFT JOIN public.cargo c ON f.cargo_id_cargo = c.id_cargo
@@ -21,7 +21,7 @@ exports.obterFuncionario = async (req, res) => {
         const cpf = req.params.id;
         const result = await query(
             `SELECT f.pessoa_cpf_pessoa, p.nome_pessoa, p.data_nascimento_pessoa, p.endereco_pessoa, p.senha_pessoa, p.email_pessoa,
-                    f.salario_funcionario, f.cargo_id_cargo, f.especialidade_funcionario
+                    f.salario_funcionario, f.cargo_id_cargo, f.especialidade_funcionario, f.foto_funcionario
              FROM public.funcionario f
              JOIN public.pessoa p ON f.pessoa_cpf_pessoa = p.cpf_pessoa
              WHERE f.pessoa_cpf_pessoa = $1`,
@@ -43,7 +43,7 @@ exports.criarFuncionario = async (req, res) => {
     const client = await pool.connect();
     try {
         const { pessoa_cpf_pessoa, nome_pessoa, data_nascimento_pessoa, endereco_pessoa, senha_pessoa, email_pessoa,
-                salario_funcionario, cargo_id_cargo, especialidade_funcionario } = req.body;
+                salario_funcionario, cargo_id_cargo, especialidade_funcionario, foto_funcionario } = req.body;
 
         if (!pessoa_cpf_pessoa || !nome_pessoa) {
             return res.status(400).json({ sucesso: false, mensagem: 'CPF e nome sao obrigatorios.' });
@@ -58,9 +58,9 @@ exports.criarFuncionario = async (req, res) => {
         );
 
         const result = await client.query(
-            `INSERT INTO public.funcionario (pessoa_cpf_pessoa, salario_funcionario, cargo_id_cargo, especialidade_funcionario)
-             VALUES ($1, $2, $3, $4) RETURNING *`,
-            [pessoa_cpf_pessoa, salario_funcionario || 0.0, cargo_id_cargo || null, especialidade_funcionario || null]
+            `INSERT INTO public.funcionario (pessoa_cpf_pessoa, salario_funcionario, cargo_id_cargo, especialidade_funcionario, foto_funcionario)
+             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+            [pessoa_cpf_pessoa, salario_funcionario || 0.0, cargo_id_cargo || null, especialidade_funcionario || null, foto_funcionario || null]
         );
 
         await client.query('COMMIT');
@@ -85,7 +85,7 @@ exports.atualizarFuncionario = async (req, res) => {
     try {
         const cpf = req.params.id;
         const { nome_pessoa, data_nascimento_pessoa, endereco_pessoa, senha_pessoa, email_pessoa,
-                salario_funcionario, cargo_id_cargo, especialidade_funcionario } = req.body;
+                salario_funcionario, cargo_id_cargo, especialidade_funcionario, foto_funcionario } = req.body;
 
         await client.query('BEGIN');
 
@@ -98,9 +98,9 @@ exports.atualizarFuncionario = async (req, res) => {
 
         const result = await client.query(
             `UPDATE public.funcionario
-             SET salario_funcionario = $1, cargo_id_cargo = $2, especialidade_funcionario = $3
-             WHERE pessoa_cpf_pessoa = $4 RETURNING *`,
-            [salario_funcionario || 0.0, cargo_id_cargo || null, especialidade_funcionario || null, cpf]
+             SET salario_funcionario = $1, cargo_id_cargo = $2, especialidade_funcionario = $3, foto_funcionario = $4
+             WHERE pessoa_cpf_pessoa = $5 RETURNING *`,
+            [salario_funcionario || 0.0, cargo_id_cargo || null, especialidade_funcionario || null, foto_funcionario || null, cpf]
         );
 
         if (result.rows.length === 0) {
